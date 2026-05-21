@@ -37,7 +37,7 @@ function DownloadPage() {
   function downloadXLS() {
     const buf = buildParticipantsXLSX(selected);
     const name = `mmpi_participants_${timestamp()}.xlsx`;
-    downloadBlob(new Uint8Array(buf), name, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    downloadBlob(buf, name, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
     toast.success(`Downloaded ${name}`);
   }
 
