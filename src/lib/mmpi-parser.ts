@@ -32,8 +32,8 @@ function toDate(value: unknown): Date | null {
     const s = value.trim();
     // Numeric string serial
     if (/^\d+(\.\d+)?$/.test(s) && Number(s) >= 10000) return serialToDate(Number(s));
-    // MM/DD/YYYY or M/D/YYYY [HH:MM[:SS] [AM/PM]]
-    const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM|am|pm)?)?$/);
+    // MM/DD/YYYY or M/D/YYYY [HH:MM[:SS] [AM/PM]] — parsed manually in UTC to avoid timezone shifts
+    const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM|am|pm)?)?$/);
     if (m) {
       const [, mo, d, y, hh, mm, ss, ap] = m;
       let h = hh ? parseInt(hh, 10) : 0;
@@ -42,16 +42,22 @@ function toDate(value: unknown): Date | null {
         if (up === "PM" && h < 12) h += 12;
         if (up === "AM" && h === 12) h = 0;
       }
-      return new Date(
-        parseInt(y, 10),
-        parseInt(mo, 10) - 1,
-        parseInt(d, 10),
-        h,
-        mm ? parseInt(mm, 10) : 0,
-        ss ? parseInt(ss, 10) : 0,
-      );
+      let year = parseInt(y, 10);
+      if (year < 100) year += 2000;
+      const month = parseInt(mo, 10);
+      const day = parseInt(d, 10);
+      if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+      const dt = new Date(Date.UTC(year, month - 1, day, h, mm ? parseInt(mm, 10) : 0, ss ? parseInt(ss, 10) : 0));
+      if (dt.getUTCMonth() !== month - 1 || dt.getUTCDate() !== day) return null;
+      return dt;
     }
-    // ISO
+    // YYYY-MM-DD (treat as UTC calendar date)
+    const ymd = s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+    if (ymd) {
+      const [, y, mo, d, hh, mm, ss] = ymd;
+      const dt = new Date(Date.UTC(parseInt(y, 10), parseInt(mo, 10) - 1, parseInt(d, 10), hh ? parseInt(hh, 10) : 0, mm ? parseInt(mm, 10) : 0, ss ? parseInt(ss, 10) : 0));
+      if (!isNaN(dt.getTime())) return dt;
+    }
     const iso = new Date(s);
     if (!isNaN(iso.getTime())) return iso;
   }
@@ -61,13 +67,13 @@ function toDate(value: unknown): Date | null {
 const pad = (n: number, w = 2) => String(n).padStart(w, "0");
 
 function formatDDMMYYYY(d: Date): string {
-  return `${pad(d.getDate())}${pad(d.getMonth() + 1)}${d.getFullYear()}`;
+  return `${pad(d.getUTCDate())}${pad(d.getUTCMonth() + 1)}${d.getUTCFullYear()}`;
 }
 function formatDateSlash(d: Date): string {
-  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+  return `${pad(d.getUTCDate())}/${pad(d.getUTCMonth() + 1)}/${d.getUTCFullYear()}`;
 }
 function formatHHMM(d: Date): string {
-  return `${pad(d.getHours())}${pad(d.getMinutes())}`;
+  return `${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}`;
 }
 
 function cellString(v: unknown): string {
