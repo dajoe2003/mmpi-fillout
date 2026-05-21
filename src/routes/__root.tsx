@@ -9,6 +9,8 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import { Toaster } from "@/components/ui/sonner";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 function NotFoundComponent() {
   return (
@@ -72,11 +74,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "MMPI-2 Fillout" },
+      { name: "description", content: "Convert XLSX/CSV/Google Sheet responses into MMPI-2 DAT files." },
+      { name: "author", content: "MMPI-2 Fillout" },
+      { property: "og:title", content: "MMPI-2 Fillout" },
+      { property: "og:description", content: "Convert XLSX/CSV/Google Sheet responses into MMPI-2 DAT files." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
@@ -96,9 +98,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <head>
         <HeadContent />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem('theme');if(t==='light')document.documentElement.classList.remove('dark');else document.documentElement.classList.add('dark');}catch(e){}`,
+          }}
+        />
       </head>
       <body>
         {children}
@@ -113,7 +120,21 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <div className="min-h-screen bg-background text-foreground">
+        <header className="border-b border-border bg-card/40 backdrop-blur sticky top-0 z-30">
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+            <Link to="/" className="flex items-center gap-2 font-semibold tracking-tight">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground text-sm font-bold">M2</span>
+              <span>MMPI-2 Fillout</span>
+            </Link>
+            <ThemeToggle />
+          </div>
+        </header>
+        <main className="mx-auto max-w-6xl px-6 py-8">
+          <Outlet />
+        </main>
+        <Toaster position="top-right" richColors closeButton />
+      </div>
     </QueryClientProvider>
   );
 }
