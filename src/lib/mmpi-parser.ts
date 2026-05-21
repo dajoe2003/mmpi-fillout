@@ -197,7 +197,7 @@ export function buildDAT(participants: Participant[]): string {
   return participants.map((p) => buildDATLine(p.raw as unknown[])).join("");
 }
 
-export function buildParticipantsXLSX(participants: Participant[]): Uint8Array {
+export function buildParticipantsXLSX(participants: Participant[]): ArrayBuffer {
   const data = [
     ["Number", "Tanggal Tes", "Nama", "Nomor RM", "Nomor HP", "Tempat Tes", "Alamat"],
     ...participants.map((p) => [p.number, p.tanggalTes, p.nama, p.nomorRM, p.nomorHP, p.tempatTes, p.alamat]),
@@ -205,7 +205,7 @@ export function buildParticipantsXLSX(participants: Participant[]): Uint8Array {
   const ws = XLSX.utils.aoa_to_sheet(data);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Participants");
-  return XLSX.write(wb, { type: "array", bookType: "xlsx" }) as Uint8Array;
+  return XLSX.write(wb, { type: "array", bookType: "xlsx" }) as ArrayBuffer;
 }
 
 export function timestamp(): string {
