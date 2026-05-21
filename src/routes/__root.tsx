@@ -82,6 +82,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "MMPI-2 Fillout" },
+      { name: "twitter:description", content: "Convert XLSX/CSV/Google Sheet responses into MMPI-2 DAT files." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f3f0cd6c-9246-4e1a-a853-db4a43869858/id-preview-3bbfb8b0--9eb06bf7-4f02-4b6c-a823-cb8a15e63388.lovable.app-1779349389115.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f3f0cd6c-9246-4e1a-a853-db4a43869858/id-preview-3bbfb8b0--9eb06bf7-4f02-4b6c-a823-cb8a15e63388.lovable.app-1779349389115.png" },
     ],
     links: [
       {
