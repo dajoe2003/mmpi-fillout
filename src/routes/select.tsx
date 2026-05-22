@@ -153,3 +153,59 @@ function HeaderFilter({ label, value, onChange }: { label: string; value: string
     </th>
   );
 }
+
+function TempatFilter({
+  options,
+  selected,
+  onChange,
+}: {
+  options: string[];
+  selected: Set<string>;
+  onChange: (s: Set<string>) => void;
+}) {
+  const active = selected.size > 0;
+  function toggle(v: string) {
+    const next = new Set(selected);
+    if (next.has(v)) next.delete(v);
+    else next.add(v);
+    onChange(next);
+  }
+  return (
+    <th className="px-4 py-3 text-left font-semibold">
+      <Popover>
+        <PopoverTrigger asChild>
+          <button className="inline-flex items-center gap-1.5 text-foreground hover:text-primary transition">
+            Tempat Tes
+            <Filter className={`h-3.5 w-3.5 ${active ? "text-primary" : "opacity-60"}`} />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent className="w-64 p-3" align="start">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-medium text-muted-foreground">Filter Tempat Tes</p>
+              {active && (
+                <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" onClick={() => onChange(new Set())}>
+                  Clear
+                </Button>
+              )}
+            </div>
+            <div className="max-h-64 space-y-1 overflow-auto">
+              {options.length === 0 && (
+                <p className="px-1 py-2 text-xs text-muted-foreground">No locations</p>
+              )}
+              {options.map((opt) => (
+                <label
+                  key={opt}
+                  className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-accent"
+                >
+                  <Checkbox checked={selected.has(opt)} onCheckedChange={() => toggle(opt)} />
+                  <span className="truncate">{opt}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
+    </th>
+  );
+}
