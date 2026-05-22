@@ -73,7 +73,7 @@ function formatDateSlash(d: Date): string {
   return `${pad(d.getUTCDate())}/${pad(d.getUTCMonth() + 1)}/${d.getUTCFullYear()}`;
 }
 function formatHHMM(d: Date): string {
-  return `${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}`;
+  return `${pad(d.getHours())}${pad(d.getMinutes())}`;
 }
 
 function cellString(v: unknown): string {
