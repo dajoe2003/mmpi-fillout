@@ -18,10 +18,19 @@ export interface ParsedData {
   participants: Participant[];
 }
 
-// Excel serial date -> JS Date (treat as days since 1899-12-30, UTC)
+// Excel serial date -> JS Date constructed in LOCAL time so that
+// getDate()/getHours() return the literal calendar values regardless of TZ.
 function serialToDate(serial: number): Date {
-  const ms = Math.round(serial * 86400 * 1000);
-  return new Date(Date.UTC(1899, 11, 30) + ms);
+  const totalMs = Math.round(serial * 86400 * 1000);
+  const days = Math.floor(totalMs / 86400000);
+  const remMs = totalMs - days * 86400000;
+  const base = new Date(1899, 11, 30);
+  base.setDate(base.getDate() + days);
+  const hours = Math.floor(remMs / 3600000);
+  const mins = Math.floor((remMs % 3600000) / 60000);
+  const secs = Math.floor((remMs % 60000) / 1000);
+  base.setHours(hours, mins, secs, 0);
+  return base;
 }
 
 function toDate(value: unknown): Date | null {
@@ -47,15 +56,15 @@ function toDate(value: unknown): Date | null {
       const month = parseInt(mo, 10);
       const day = parseInt(d, 10);
       if (month < 1 || month > 12 || day < 1 || day > 31) return null;
-      const dt = new Date(Date.UTC(year, month - 1, day, h, mm ? parseInt(mm, 10) : 0, ss ? parseInt(ss, 10) : 0));
-      if (dt.getUTCMonth() !== month - 1 || dt.getUTCDate() !== day) return null;
+      const dt = new Date(year, month - 1, day, h, mm ? parseInt(mm, 10) : 0, ss ? parseInt(ss, 10) : 0);
+      if (dt.getMonth() !== month - 1 || dt.getDate() !== day) return null;
       return dt;
     }
     // YYYY-MM-DD (treat as UTC calendar date)
     const ymd = s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
     if (ymd) {
       const [, y, mo, d, hh, mm, ss] = ymd;
-      const dt = new Date(Date.UTC(parseInt(y, 10), parseInt(mo, 10) - 1, parseInt(d, 10), hh ? parseInt(hh, 10) : 0, mm ? parseInt(mm, 10) : 0, ss ? parseInt(ss, 10) : 0));
+      const dt = new Date(parseInt(y, 10), parseInt(mo, 10) - 1, parseInt(d, 10), hh ? parseInt(hh, 10) : 0, mm ? parseInt(mm, 10) : 0, ss ? parseInt(ss, 10) : 0);
       if (!isNaN(dt.getTime())) return dt;
     }
     const iso = new Date(s);
@@ -67,13 +76,13 @@ function toDate(value: unknown): Date | null {
 const pad = (n: number, w = 2) => String(n).padStart(w, "0");
 
 function formatDDMMYYYY(d: Date): string {
-  return `${pad(d.getUTCDate())}${pad(d.getUTCMonth() + 1)}${d.getUTCFullYear()}`;
+  return `${pad(d.getDate())}${pad(d.getMonth() + 1)}${d.getFullYear()}`;
 }
 function formatDateSlash(d: Date): string {
-  return `${pad(d.getUTCDate())}/${pad(d.getUTCMonth() + 1)}/${d.getUTCFullYear()}`;
+  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
 }
 function formatHHMM(d: Date): string {
-  return `${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}`;
+  return `${pad(d.getHours())}${pad(d.getMinutes())}`;
 }
 
 function cellString(v: unknown): string {
