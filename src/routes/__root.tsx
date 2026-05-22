@@ -127,9 +127,9 @@ function RootComponent() {
       <div className="min-h-screen bg-background text-foreground">
         <header className="border-b border-border bg-card/40 backdrop-blur sticky top-0 z-30">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-            <Link to="/" className="flex items-center gap-2 font-semibold tracking-tight">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground text-sm font-bold">M2</span>
-              <span>MMPI-2 Fillout</span>
+            <Link to="/" className="flex items-center gap-3 font-bold tracking-tight">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-primary text-primary-foreground text-sm font-bold">M2</span>
+              <span className="text-2xl md:text-3xl uppercase tracking-wider">MMPI-2 FILLOUT</span>
             </Link>
             <ThemeToggle />
           </div>
