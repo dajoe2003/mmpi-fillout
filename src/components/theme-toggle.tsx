@@ -1,18 +1,17 @@
 import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
 
 export function ThemeToggle() {
   const [dark, setDark] = useState(true);
 
   useEffect(() => {
-    const isDark = document.documentElement.classList.contains("dark");
-    setDark(isDark);
+    setDark(document.documentElement.classList.contains("dark"));
   }, []);
 
-  function toggle(v: boolean) {
-    setDark(v);
-    if (v) {
+  function toggle() {
+    const next = !dark;
+    setDark(next);
+    if (next) {
       document.documentElement.classList.add("dark");
       localStorage.setItem("theme", "dark");
     } else {
@@ -22,10 +21,17 @@ export function ThemeToggle() {
   }
 
   return (
-    <div className="flex items-center gap-2 text-muted-foreground">
-      <Sun className="h-4 w-4" />
-      <Switch checked={dark} onCheckedChange={toggle} aria-label="Toggle dark mode" />
-      <Moon className="h-4 w-4" />
-    </div>
+    <button
+      type="button"
+      onClick={toggle}
+      aria-label="Toggle dark mode"
+      className={`inline-flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-200 hover:scale-105 ${
+        dark
+          ? "border-transparent bg-primary text-primary-foreground shadow-sm hover:bg-primary/90"
+          : "border-border bg-transparent text-foreground hover:bg-accent"
+      }`}
+    >
+      {dark ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+    </button>
   );
 }
