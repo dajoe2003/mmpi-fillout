@@ -19,19 +19,30 @@ function SelectPage() {
   const navigate = useNavigate();
   const { data, selectedIndices, sourceLabel } = useMmpi();
   const [filters, setFilters] = useState<Record<FilterKey, string>>({ tanggalTes: "", nama: "", tempatTes: "" });
+  const [tempatSelection, setTempatSelection] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!data) navigate({ to: "/" });
   }, [data, navigate]);
+
+  const tempatOptions = useMemo(() => {
+    if (!data) return [] as string[];
+    const s = new Set<string>();
+    data.participants.forEach((p) => {
+      const v = p.tempatTes.trim();
+      if (v) s.add(v);
+    });
+    return Array.from(s).sort((a, b) => a.localeCompare(b));
+  }, [data]);
 
   const filtered = useMemo(() => {
     if (!data) return [];
     return data.participants.filter((p) =>
       (!filters.tanggalTes || p.tanggalTes.toLowerCase().includes(filters.tanggalTes.toLowerCase())) &&
       (!filters.nama || p.nama.toLowerCase().includes(filters.nama.toLowerCase())) &&
-      (!filters.tempatTes || p.tempatTes.toLowerCase().includes(filters.tempatTes.toLowerCase())),
+      (tempatSelection.size === 0 || tempatSelection.has(p.tempatTes.trim())),
     );
-  }, [data, filters]);
+  }, [data, filters, tempatSelection]);
 
   if (!data) return null;
 
@@ -80,7 +91,11 @@ function SelectPage() {
                 <th className="px-4 py-3 text-left font-semibold">Number</th>
                 <HeaderFilter label="Tanggal Tes" value={filters.tanggalTes} onChange={(v) => setFilters({ ...filters, tanggalTes: v })} />
                 <HeaderFilter label="Nama" value={filters.nama} onChange={(v) => setFilters({ ...filters, nama: v })} />
-                <HeaderFilter label="Tempat Tes" value={filters.tempatTes} onChange={(v) => setFilters({ ...filters, tempatTes: v })} />
+                <TempatFilter
+                  options={tempatOptions}
+                  selected={tempatSelection}
+                  onChange={setTempatSelection}
+                />
               </tr>
             </thead>
             <tbody>
